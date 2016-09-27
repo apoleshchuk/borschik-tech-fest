@@ -1,0 +1,30 @@
+{
+  "name": "borschik-tech-fest",
+  "version": "0.0.0",
+  "description": "borschik fest tech",
+  "main": "techs/fest.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apoleshchuk/borschik-tech-fest.git"
+  },
+  "keywords": [
+    "borschik",
+    "borschik-tech",
+    "fest"
+  ],
+  "author": "Anton Poleshchuk <anton@poleshchuk.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/apoleshchuk/borschik-tech-fest/issues"
+  },
+  "homepage": "https://github.com/apoleshchuk/borschik-tech-fest#readme",
+  "dependencies": {
+    "borschik": "^1.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.2"
+  }
+}
