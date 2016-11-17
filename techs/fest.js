@@ -11,11 +11,11 @@ const uniqStr = `${String.fromCharCode(0)}borschik${String.fromCharCode(0)}`;
 const stringRe = "(?:(?:'[^'\\r\\n]*')|(?:\"[^\"\\r\\n]*\"))";
 const attrsRe = "([^>]*)";
 
-const parsedAttrRe = "(?:(src|href|background)\\s*=\\s*(" + stringRe + "))";
+const parsedAttrRe = "(?:(src|href|background)\\s*(=|:)\\s*(" + stringRe + "))";
 
 const commentRe = "(?:<!-->|<!--[^\\[<][\\s\\S]*?-->)";
 const templateRe = "(?:<fest:template" + attrsRe + ">\\n?|<\\/fest:template>)\\n?";
-const includeRe = "(?:<fest:include" + attrsRe + ">)";
+const includeRe = "(?:<fest:(include|insert)" + attrsRe + ">)";
 
 const allIncRe = new RegExp(commentRe + '|' + templateRe + '|' + includeRe + '|' + parsedAttrRe, 'g');
 const attrRe = new RegExp("\\s+([a-z_:\\-]+)\\s*=\\s*(" + stringRe + ")", 'gim');
@@ -36,8 +36,8 @@ exports.Tech = CSSBASE.Tech.inherit({
             let text = content instanceof Buffer ? content.toString('utf-8') : content;
 
             let texts = text
-                .replace(allIncRe, function(_, templateAttrs, includeAttrs, attr, src) {
-                    if (includeAttrs) {
+                .replace(allIncRe, function(_, templateAttrs, includeType, includeAttrs, attr, attrSeparator, src) {
+                    if (includeType && includeAttrs) {
                         // fest:include
                         let attrs = parseAttrs(includeAttrs);
                         let url = attrs.src;
@@ -57,13 +57,15 @@ exports.Tech = CSSBASE.Tech.inherit({
                             // save included path to check duplicates
                             tech.processedFiles[absPath] = _this.path;
                             chunk.type = 'include';
+                            chunk.includeType = includeType;
                         }
 
                         includes.push(chunk);
                     } else if (attr && src && (src = parseUrl(src)) && U.isLinkProcessable(src) && _this.isFreezableUrl(src)) {
                         includes.push({
                             url: _this.pathTo(src),
-                            type: attr
+                            type: attr,
+                            separator: attrSeparator
                         });
                     } else {
                         includes.push({
@@ -104,7 +106,9 @@ exports.Tech = CSSBASE.Tech.inherit({
 
                 if (item.type === 'include') {
                     let processed = this.child('include', item.url).process(path);
-                    if (this.tech.opts.comments) {
+                    if (item.includeType == 'insert') {
+                        parsed[i] = escapeJS(processed);
+                    } else if (this.tech.opts.comments) {
                         parsed[i] = commentsWrap(processed, item.url);
                     } else {
                         parsed[i] = processed;
@@ -114,7 +118,7 @@ exports.Tech = CSSBASE.Tech.inherit({
 
                 if (item.type == 'href' || item.type == 'src' || item.type == 'background') {
                     // freeze images with cssBase.processLink
-                    parsed[i] = item.type + '=' + this.child(item.type, item.url).process(path);
+                    parsed[i] = item.type + item.separator + this.child(item.type, item.url).process(path);
                 } else {
                     parsed[i] = item.file;
                 }
@@ -161,5 +165,17 @@ function parseAttrs(str) {
 
 
 function commentsWrap(content, file) {
-    return `\n<!-- fest-file-begin:${file} -->\n${content}\n<!-- fest-file-begin:${file} -->\n`;
+    return `\n<!-- fest-file-begin:${file} -->\n${content}\n<!-- fest-file-end:${file} -->\n`;
+}
+
+var jschars=/[<>]/g;
+var jshash = {
+	"<" :"&lt;",
+	">" :"&gt;"
+};
+
+function escapeJS(s) {
+	return s.replace(jschars, function (chr) {
+		return jshash[chr];
+	});
 }
