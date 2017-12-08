@@ -11,7 +11,7 @@ const uniqStr = `${String.fromCharCode(0)}borschik${String.fromCharCode(0)}`;
 const stringRe = "(?:(?:'[^'\\r\\n]*')|(?:\"[^\"\\r\\n]*\"))";
 const attrsRe = "([^>]*)";
 
-const parsedAttrRe = "(?:(src|href|background)\\s*(=|:)\\s*(" + stringRe + "))";
+const parsedAttrRe = "(?:[\"']?(src|href|background)[\"']?\\s*(=|:)\\s*(" + stringRe + "))";
 
 const commentRe = "(?:<!-->|<!--[^\\[<][\\s\\S]*?-->)";
 const templateRe = "(?:<fest:template" + attrsRe + ">\\n?|<\\/fest:template>)\\n?";
