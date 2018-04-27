@@ -1,6 +1,6 @@
 {
   "name": "borschik-tech-fest",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "borschik fest tech",
   "main": "techs/fest.js",
   "scripts": {
