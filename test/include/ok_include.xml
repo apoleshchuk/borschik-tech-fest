@@ -1,8 +1,8 @@
 <fest:template xmlns:fest="http://fest.mail.ru" context_name="json">
-    
+
 <!-- fest-file-begin:child.xml -->
     child.xml content
 
-<!-- fest-file-begin:child.xml -->
+<!-- fest-file-end:child.xml -->
 
 </fest:template>
